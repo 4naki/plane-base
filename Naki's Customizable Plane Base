@@ -7,21 +7,25 @@
 #ifdef httpRequest(string)
 @persist [Version Link]:string Block
 #endif
-#runOnChat(1)
 if(first()){
     #ifdef httpRequest(string)
         Link = "https://github.com/4naki/plane-base/blob/main/Naki's%20Customizable%20Plane%20Base"
         VersionCheckLink = "https://raw.githubusercontent.com/4naki/plane-base/main/version"
         Version = "1.0"
         
+        #Used for development only!
+        DevBranch=0
+        
         runOnHTTP(1)
         if(Link!=""){
         }else{
+            print("Link is empty!")
             Block=1
         }
         if(VersionCheckLink!=""){
             httpRequest(VersionCheckLink)
         }else{
+            print("VersionCheckLink is empty!")
             Block=1
         }
     #else
@@ -35,10 +39,21 @@ if(first()){
             
             print("["+entity():getName()+"]")
             
-            if(Version:toNumber()!=ReturnData:toNumber()){
-                print("Update available! Running version: "+Version)
-                print("Latest version: "+ReturnData)
-                print("Link: "+Link)
+            local V = Version:toNumber()
+            local RD = ReturnData:toNumber()
+            
+            if(V!=RD){
+                if(V>RD){
+                    if(DevBranch){
+                        print("Running Development Branch version: "+Version)
+                    }else{
+                        print("Running version ahead of current release! version: "+Version)
+                    }
+                }else{
+                    print("Update available! Running version: "+Version)
+                    print("Latest version: "+ReturnData)
+                    print("Link: "+Link)
+                }
             }else{
                 print("Up to date! Running version: "+Version)
             }
