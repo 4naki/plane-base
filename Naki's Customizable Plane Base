@@ -10,7 +10,7 @@
 #runOnChat(1)
 if(first()){
     #ifdef httpRequest(string)
-        Link = ""
+        Link = "https://github.com/4naki/plane-base/blob/main/Naki's%20Customizable%20Plane%20Base"
         VersionCheckLink = "https://raw.githubusercontent.com/4naki/plane-base/main/version"
         Version = "1.0"
         
