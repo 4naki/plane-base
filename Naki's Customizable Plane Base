@@ -1,7 +1,7 @@
 @name Naki's Customizable Plane Base
 @inputs [Base Seat Rotor W_F W_R_L W_R_R SetAng]:entity CamAng:angle
 @outputs Throttle JoyX JoyY Yaw Power RPMOut CamPos:vector CamDistance CamParent:entity
-@persist Throttle Active Power Val Val2 RPM TP CamParent:entity ValAng
+@persist MouseAim Throttle Active Power Val Val2 RPM TP CamParent:entity ValAng DevBranch
 @trigger none
 
 #ifdef httpRequest(string)
@@ -11,10 +11,10 @@ if(first()){
     #ifdef httpRequest(string)
         Link = "https://github.com/4naki/plane-base/blob/main/Naki's%20Customizable%20Plane%20Base"
         VersionCheckLink = "https://raw.githubusercontent.com/4naki/plane-base/main/version"
-        Version = "1.0"
+        Version = "1.1"
         
         #Used for development only!
-        DevBranch=0
+        DevBranch=1
         
         runOnHTTP(1)
         if(Link!=""){
@@ -305,31 +305,29 @@ if(first()){
     YVel2=YVel*(abs(YVel*0.65)>10)
     
     if(!MouseAim){
-        Tilt=ang(0+JoyX*1.5,Yaw*0.1,JoyY*1)*2
+        Tilt=ang(0+JoyX*1.5,Yaw*0.4,JoyY*1)*2
         if(JoyX!=0|JoyY!=0|Yaw!=0){
-            Ang=(Tilt)*125
+            Ang=(Tilt)*125*clamp(Base:velL():x()*0.01,0,1)
         }
     }else{
-        Tilt=ang(0+JoyX*0.375,Yaw*0.1,JoyY*0.75)+(Base:toLocal(CamAng*ang(1,Power&Active,0))*ang(1,Power&Active,0))
-        Ang=((ang(0,0,1))+Tilt)*300
+        Tilt=ang(0+JoyX*0.375,Yaw*0.3,JoyY*0.75)+(Base:toLocal(CamAng*ang(1,Power&Active,0))*ang(1,Power&Active,0))
+        Ang=((ang(0,0,1))+Tilt)*300*clamp(-1+(Base:velL():x()*0.01),0,1)
     }
     
-    Damping=(-((Base:forward()*Base:velL():x()*0.002)+(-Base:right()*Base:velL():y()*0.1)+(Base:up()*Base:velL():z()*0.1))*0.1)*VelDampingMult*clamp(Base:velL():x()*0.002,0,1)
+    Damping=(-((Base:forward()*Base:velL():x()*0.002*abs(OutputZ))+(-Base:right()*Base:velL():y()*0.1)+(Base:up()*Base:velL():z()*0.1))*0.1)*VelDampingMult*clamp(-3+(Base:velL():x()*0.01),0,1)
     Damping2=(Base:angVel()*AngDamping*1)*AngDampingMult
     
     Base:applyForce((((Damping+((Base:forward()*RPM/100)*(ThrustMult/100))*(Throttle/100)))*(Base:mass()*(50))))
     Base:applyAngForce((((Ang*TurnSpeedMult)-Damping2)*((Base:mass()/25)*(RPM/100))))
     
     
-    if(clamp(1-(-0.25+(Base:velL():x()*0.001)),0,1)!=0|clamp(1-(-0.25+(Base:velL():x()*0.001)),0,1)!=1){
-        Base:propGravity(100*clamp(1-(Base:velL():x()*0.001),0,1))
-        
-        W_F:propGravity(100*clamp(1-(-0.25+(Base:velL():x()*0.001)),0,1))
-        W_F:setMass(Front_Wheel_Weight*clamp(1-(-0.25+(Base:velL():x()*0.00045)),0.25,1))
-        foreach(I,E:entity=array(W_R_L,W_R_R)){
-            E:propGravity(100*clamp(1-(-0.25+(Base:velL():x()*0.001)),0,1))
-            E:setMass(Rear_Wheel_Weight*clamp(1-(-0.25+(Base:velL():x()*0.00045)),0.25,1))
-        }
+    Base:propGravity(100*clamp(2-(Base:velL():x()*0.00025),0,1))
+    
+    W_F:propGravity(100*clamp(1-(-0.25+(Base:velL():x()*0.002)),0,1))
+    W_F:setMass(Front_Wheel_Weight*clamp(1-(-0.25+(Base:velL():x()*0.00055)),0.25,1))
+    foreach(I,E:entity=array(W_R_L,W_R_R)){
+        E:propGravity(100*clamp(1-(-0.25+(Base:velL():x()*0.002)),0,1))
+        E:setMass(Rear_Wheel_Weight*clamp(1-(-0.25+(Base:velL():x()*0.00055)),0.25,1))
     }
     if(changed(Power)){
         if(Power){
