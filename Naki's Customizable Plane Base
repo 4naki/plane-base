@@ -11,10 +11,10 @@ if(first()){
     #ifdef httpRequest(string)
         Link = "https://github.com/4naki/plane-base/blob/main/Naki's%20Customizable%20Plane%20Base"
         VersionCheckLink = "https://raw.githubusercontent.com/4naki/plane-base/main/version"
-        Version = "1.1"
+        Version = "1.2"
         
         #Used for development only!
-        DevBranch=1
+        DevBranch=0
         
         runOnHTTP(1)
         if(Link!=""){
